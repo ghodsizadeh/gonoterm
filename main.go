@@ -19,7 +19,7 @@ func main() {
 		textBlocks = append(textBlocks, TextBlock{Type: Text, Text: "Initial Text"})
 	}
 
-	var inputFields []*tview.InputField
+	var inputFields []*tview.TextArea
 	textAreaGrid := tview.NewGrid().
 		SetRows(0).
 		SetColumns(0)
@@ -29,7 +29,7 @@ func main() {
 	helpInfo := tview.NewTextView().
 		SetText("Press Ctrl-N to add block, Ctrl-R to remove block, Ctrl-S to save, Ctrl-D/H to switch between inputs")
 	position := tview.NewTextView().
-		SetDynamicColors(true).
+		// SetDynamicColors(true).
 		SetTextAlign(tview.AlignRight)
 	pages := tview.NewPages()
 

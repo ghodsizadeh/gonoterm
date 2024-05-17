@@ -6,13 +6,13 @@ import (
 	"github.com/rivo/tview"
 )
 
-func updateTextBlocks(grid *tview.Grid, textBlocks []TextBlock, inputFields *[]*tview.InputField) {
+func updateTextBlocks(grid *tview.Grid, textBlocks []TextBlock, inputFields *[]*tview.TextArea) {
 	grid.Clear()
 	*inputFields = nil
 	for i := range textBlocks {
 		//
-		inputField := tview.NewInputField().
-			SetText(textBlocks[i].Text).
+		inputField := tview.NewTextArea().
+			SetText(textBlocks[i].Text, true).
 			SetPlaceholder("Enter text here...")
 		// SetLabel(fmt.Sprintf("Block %d: ", i+1)).
 		// SetFieldWidth(30)
@@ -26,8 +26,8 @@ func updateTextBlocks(grid *tview.Grid, textBlocks []TextBlock, inputFields *[]*
 		index := i
 
 		// Update block text on change
-		inputField.SetChangedFunc(func(text string) {
-			textBlocks[index].Text = text
+		inputField.SetChangedFunc(func() {
+			textBlocks[index].Text = inputField.GetText()
 		})
 
 		*inputFields = append(*inputFields, inputField)
