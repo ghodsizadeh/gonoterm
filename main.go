@@ -2,14 +2,22 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
 
+const logFileName = "app.log"
+
 func main() {
 	app := tview.NewApplication()
+	logFile, err := os.OpenFile(logFileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	// Set log output to the file
+	log.SetOutput(logFile)
+	defer logFile.Close()
 
+	log.Println("Starting gonoterm")
 	textBlocks, err := loadFromFile()
 	if err != nil {
 		log.Fatalf("Error loading text blocks: %v", err)
@@ -87,6 +95,7 @@ func main() {
 			}
 			return nil
 		}
+		saveToFile(textBlocks)
 		return event
 	})
 
