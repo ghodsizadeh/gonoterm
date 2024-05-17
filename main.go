@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"os"
 
@@ -12,11 +13,17 @@ const logFileName = "app.log"
 
 func main() {
 	app := tview.NewApplication()
-	logFile, err := os.OpenFile(logFileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	// Set log output to the file
-	log.SetOutput(logFile)
-	defer logFile.Close()
 
+	enableLogging := flag.Bool("log", false, "Enable logging")
+	flag.Parse()
+	var logFile *os.File
+	if *enableLogging {
+		logFile, _ = os.OpenFile(logFileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		// Set log output to the file
+		log.SetOutput(logFile)
+		defer logFile.Close()
+
+	}
 	log.Println("Starting gonoterm")
 	textBlocks, err := loadFromFile()
 	if err != nil {

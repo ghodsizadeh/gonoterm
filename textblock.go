@@ -2,8 +2,11 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"io/ioutil"
+	"log"
 	"os"
+	"path/filepath"
 )
 
 type BlockType int
@@ -32,7 +35,11 @@ func (b BlockType) String() string {
 	}
 }
 
-const fileName = "textblocks.json"
+// const fileName = "textblocks.json"
+var (
+	namespace = flag.String("namespace", "default-gonoterm", "Namespace for the textblocks")
+	local     = flag.Bool("local", false, "Use local storage")
+)
 
 // Save textBlocks to a file
 func saveToFile(textBlocks []TextBlock) error {
@@ -40,11 +47,28 @@ func saveToFile(textBlocks []TextBlock) error {
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile(fileName, data, 0644)
+
+	fileName := getFileName()
+	dir := filepath.Dir(fileName)
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		err = os.MkdirAll(dir, 0755)
+		if err != nil {
+			log.Fatalf("Error creating directory: %v", err)
+		}
+	}
+
+	err = os.WriteFile(fileName, data, 0644)
+	log.Println("Saved to file: ", fileName)
+	if err != nil {
+		log.Fatalf("Error writing to file: %v", err)
+	}
+	return nil
 }
 
 // Load textBlocks from a file
 func loadFromFile() ([]TextBlock, error) {
+
+	fileName := getFileName()
 	data, err := ioutil.ReadFile(fileName)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -55,4 +79,20 @@ func loadFromFile() ([]TextBlock, error) {
 	var textBlocks []TextBlock
 	err = json.Unmarshal(data, &textBlocks)
 	return textBlocks, err
+}
+
+func getFileName() string {
+	if *local {
+		return "gonoterm.json"
+	}
+	// Use a universal file path
+	// return "/universal/path/" + *namespace + ".json"
+	// get  a path in home directory config
+	configDir, err := os.UserConfigDir()
+	if err != nil {
+		log.Fatalf("Error getting config directory: %v", err)
+	}
+	path := filepath.Join(configDir, "gonoterm", *namespace+".json")
+	log.Println("Path: ", path)
+	return path
 }
