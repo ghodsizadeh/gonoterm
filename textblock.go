@@ -7,6 +7,8 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/rivo/tview"
 )
 
 type BlockType int
@@ -95,4 +97,33 @@ func getFileName() string {
 	path := filepath.Join(configDir, "gonoterm", *namespace+".json")
 	log.Println("Path: ", path)
 	return path
+}
+
+func handleTypeSelection(app *tview.Application, pages *tview.Pages, textBlocks []TextBlock, inputFields *[]*tview.TextArea,
+	textAreaGrid *tview.Grid) {
+	currentFocus := app.GetFocus()
+	for i, inputField := range *inputFields {
+		if currentFocus == inputField {
+			modal := tview.NewModal().
+				SetText("Select the type of the block").
+				AddButtons([]string{"Text", "Code", "Math"}).
+				SetDoneFunc(func(buttonIndex int, buttonLabel string) {
+					switch buttonLabel {
+					case "Text":
+						textBlocks[i].Type = Text
+					case "Code":
+						textBlocks[i].Type = Code
+					case "Math":
+						textBlocks[i].Type = Math
+					}
+					updateTextBlocks(textAreaGrid, textBlocks, inputFields)
+
+					pages.RemovePage("modal")
+				})
+			pages.AddPage("modal", modal, true, true)
+			app.SetFocus(modal)
+
+			break
+		}
+	}
 }

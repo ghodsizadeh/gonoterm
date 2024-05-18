@@ -31,7 +31,7 @@ func main() {
 	}
 
 	if len(textBlocks) == 0 {
-		textBlocks = append(textBlocks, TextBlock{Type: Text, Text: "Initial Text"})
+		textBlocks = append(textBlocks, TextBlock{Type: Text, Text: "Hello Gonoterm!"})
 	}
 
 	var inputFields []*tview.TextArea
@@ -44,7 +44,7 @@ func main() {
 	helpInfo := tview.NewTextView().
 		SetText("Press Ctrl-N to add block, Ctrl-R to remove block, Ctrl-S to save, Ctrl-D/H to switch between inputs")
 	position := tview.NewTextView().
-		// SetDynamicColors(true).
+		SetDynamicColors(true).
 		SetTextAlign(tview.AlignRight)
 	pages := tview.NewPages()
 
@@ -69,6 +69,7 @@ func main() {
 				app.SetFocus(inputFields[len(inputFields)-1])
 			}
 			return nil
+
 		case tcell.KeyCtrlR:
 			if len(textBlocks) > 0 {
 				textBlocks = textBlocks[:len(textBlocks)-1]
@@ -83,6 +84,11 @@ func main() {
 				log.Fatalf("Error saving text blocks: %v", err)
 			}
 			return nil
+		case tcell.KeyCtrlV:
+			handleTypeSelection(app, pages, textBlocks, &inputFields, textAreaGrid)
+
+			return nil
+
 		case tcell.KeyCtrlD:
 			currentFocus := app.GetFocus()
 			for i, inputField := range inputFields {
